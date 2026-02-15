@@ -1,0 +1,192 @@
+@{
+    var title = ViewData["Title"] ?? "Engineering College ERP";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - ERP System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css">
+    <link href="/css/theme.css" rel="stylesheet" />
+    <link href="/css/site.css" rel="stylesheet" />
+    <style>
+        .bi-caret-down-fill{transition:transform .18s ease}
+        .bi-caret-down-fill.rotated{transform:rotate(-180deg)}
+        .navbar { background: white !important; border-bottom: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .sidebar { background: linear-gradient(180deg, #111827 0%, #1f2937 100%); }
+        .topbar { border-bottom: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); background: white; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <aside class="sidebar">
+                <div class="brand"><i class="bi bi-mortarboard-fill" style="color:#a78bfa"></i> ERP System</div>
+                <div class="nav">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        // Admin Menu
+                        <a asp-controller="Admin" asp-action="Dashboard" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Admin"?"active":"")"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                        
+                        <div class="mb-2">
+                            <a href="#" class="d-flex justify-content-between align-items-center" data-toggle="submenu"><span><i class="bi bi-people"></i> Students</span><i class="bi bi-caret-down-fill"></i></a>
+                            <div class="submenu mt-2" style="display:none;padding-left:.5rem">
+                                <a asp-controller="StudentManagement" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="StudentManagement"?"active":"")"><i class="bi bi-list"></i> Manage Students</a>
+                                <a asp-controller="StudentManagement" asp-action="Create" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="StudentManagement" && ViewContext.RouteData.Values["action"]?.ToString()=="Create"?"active":"")"><i class="bi bi-person-plus"></i> Add Student</a>
+                            </div>
+                        </div>
+
+                        <a asp-controller="MarksManagement" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="MarksManagement"?"active":"")"><i class="bi bi-file-earmark-text"></i> Marks Management</a>
+                        
+                        <a asp-controller="Admin" asp-action="MarksEntry" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Admin" && ViewContext.RouteData.Values["action"]?.ToString()=="MarksEntry"?"active":"")"><i class="bi bi-pencil-square"></i> Marks Entry</a>
+                        
+                        <a asp-controller="Notice" asp-action="Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Notice"?"active":"")"><i class="bi bi-megaphone"></i> Notices</a>
+                        
+                        <a asp-controller="Feedback" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Feedback"?"active":"")"><i class="bi bi-chat-left-text"></i> Feedback</a>
+                    }
+                    else if (User.IsInRole("Student"))
+                    {
+                        // Student Menu
+                        <a asp-controller="StudentDashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="StudentDashboard" && ViewContext.RouteData.Values["action"]?.ToString()=="Index"?"active":"")"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                        
+                        <a asp-controller="StudentDashboard" asp-action="Results" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="StudentDashboard" && ViewContext.RouteData.Values["action"]?.ToString()=="Results"?"active":"")"><i class="bi bi-file-earmark-text"></i> My Results</a>
+                        
+                        <a asp-controller="Notice" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Notice"?"active":"")"><i class="bi bi-megaphone"></i> Notices</a>
+                        
+                        <a asp-controller="Feedback" asp-action="Create" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Feedback"?"active":"")"><i class="bi bi-chat-left-text"></i> Send Feedback</a>
+                    }
+                </div>
+            </aside>
+
+            <div class="main">
+                <header class="topbar">
+                    <div style="display:flex;align-items:center;gap:1rem;">
+                        <button id="sidebarToggle" class="btn btn-sm btn-light" title="Toggle sidebar"><i class="bi bi-list"></i></button>
+                        <div class="searchbar">
+                            <input class="form-control form-control-sm" placeholder="Search..." />
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1rem;">
+                        <div class="profile">
+                            <div class="me-2 text-muted small">@User?.Identity?.Name</div>
+                            <div class="dropdown">
+                                <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="avatar">@((User?.Identity?.Name ?? "U")[0])</div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Edit">
+                                            <i class="bi bi-person-circle"></i> My Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="ChangePassword">
+                                            <i class="bi bi-lock"></i> Change Password
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="container">
+                @RenderBody()
+            </div>
+        }
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="/js/form-loader.js"></script>
+    <script>
+        // ========== DROPDOWN STATE PERSISTENCE ==========
+        class DropdownStateManager {
+            constructor() {
+                this.storageKey = 'erp_dropdown_states';
+                this.loadStates();
+            }
+
+            saveState(selectId, selectedValue) {
+                let states = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+                states[selectId] = selectedValue;
+                localStorage.setItem(this.storageKey, JSON.stringify(states));
+            }
+
+            loadStates() {
+                let states = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+                Object.keys(states).forEach(selectId => {
+                    let select = document.getElementById(selectId);
+                    if(select) {
+                        select.value = states[selectId];
+                    }
+                });
+            }
+
+            clearStates() {
+                localStorage.removeItem(this.storageKey);
+            }
+        }
+
+        const dropdownStateManager = new DropdownStateManager();
+
+        // Auto-save dropdown states
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('select[id]').forEach(select => {
+                select.addEventListener('change', function() {
+                    dropdownStateManager.saveState(this.id, this.value);
+                });
+            });
+
+            // Sidebar toggle
+            document.getElementById('sidebarToggle')?.addEventListener('click', function(){
+                document.querySelector('.sidebar')?.classList.toggle('collapsed');
+                document.querySelector('.main')?.classList.toggle('expanded');
+            });
+
+            // Submenu toggle
+            document.querySelectorAll('[data-toggle="submenu"]').forEach(function(btn){
+                btn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var submenu = btn.nextElementSibling;
+                    if(!submenu) return;
+                    var isHidden = window.getComputedStyle(submenu).display === 'none';
+                    submenu.style.display = isHidden ? 'block' : 'none';
+                    var caret = btn.querySelector('.bi-caret-down-fill');
+                    if(caret) caret.classList.toggle('rotated', isHidden);
+                });
+            });
+
+            // Open submenu with active link on load
+            document.querySelectorAll('.submenu').forEach(function(sub){
+                if(sub.querySelector('a.active')){
+                    sub.style.display = 'block';
+                    var toggleBtn = sub.previousElementSibling;
+                    var caret = toggleBtn?.querySelector('.bi-caret-down-fill');
+                    if(caret) caret.classList.add('rotated');
+                }
+            });
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,60 @@
+@model List<StudentPortal.Models.Marks>
+@{
+    ViewData["Title"] = "My Results";
+    var semesters = ViewBag.Semesters as List<StudentPortal.Models.Semester>;
+    var student = ViewBag.StudentProfile as StudentPortal.Models.StudentProfile;
+}
+
+<div class="mb-4">
+    <h3 class="mb-0">My Results</h3>
+    <small class="text-muted">View all semester results and marks</small>
+</div>
+
+<div class="row mb-4">
+    @foreach (var semester in semesters ?? new List<StudentPortal.Models.Semester>())
+    {
+        var semesterMarks = Model?.Where(m => m.SemesterId == semester.SemesterId).ToList() ?? new List<StudentPortal.Models.Marks>();
+        var totalMarks = semesterMarks.Sum(m => m.ObtainedMarks);
+        var avgMarks = semesterMarks.Count > 0 ? totalMarks / semesterMarks.Count : 0;
+        var passedCount = semesterMarks.Count(m => m.IsPassed);
+
+        <div class="col-md-6 col-lg-4">
+            <a href="@Url.Action("ViewMarks", "StudentDashboard", new { semesterId = semester.SemesterId })" class="text-decoration-none">
+                <div class="card h-100 hover">
+                    <div class="card-body">
+                        <h6 class="mb-3">Semester @semester.SemesterNumber</h6>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Subjects</small>
+                            <strong>@semesterMarks.Count</strong>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Average Marks</small>
+                            <strong>@avgMarks.ToString("F2")</strong>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Passed</small>
+                            <strong>@passedCount / @semesterMarks.Count</strong>
+                        </div>
+                        <div class="progress" style="height:4px">
+                            <div class="progress-bar" style="width: @((passedCount * 100 / (semesterMarks.Count == 0 ? 1 : semesterMarks.Count)))%"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <small class="text-muted">Click to view details →</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    .hover {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>

@@ -1,0 +1,212 @@
+@{
+    ViewData["Title"] = "Marks Entry";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-file-earmark-text"></i> Marks Entry</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Select Student</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="filterForm">
+                        <div class="mb-3">
+                            <label for="branchSelect" class="form-label">Branch <span class="text-danger">*</span></label>
+                            <select class="form-select" id="branchSelect" name="branchId">
+                                <option value="">-- Select Branch --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="semesterSelect" class="form-label">Semester <span class="text-danger">*</span></label>
+                            <select class="form-select" id="semesterSelect" name="semesterId">
+                                <option value="">-- Select Semester --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="studentSelect" class="form-label">Student <span class="text-danger">*</span></label>
+                            <select class="form-select" id="studentSelect" name="studentId">
+                                <option value="">-- Select Student --</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-arrow-right"></i> Load Student & Subjects
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6" id="subjectsContainer" style="display:none">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Enter Marks</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="MarksEntry" id="marksForm">
+                        <input type="hidden" name="semesterId" id="hiddenSemesterId" />
+                        <input type="hidden" name="studentId" id="hiddenStudentId" />
+
+                        <div class="alert alert-info">
+                            <strong>Student:</strong> <span id="studentNameDisplay"></span><br />
+                            <strong>Roll Number:</strong> <span id="rollNumberDisplay"></span>
+                        </div>
+
+                        <div id="subjectsMarksContainer"></div>
+
+                        <hr />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Clear
+                            </button>
+                            <button type="submit" class="btn btn-success" data-loader="true" data-loading-text="Saving Marks...">
+                                <i class="bi bi-check-circle"></i> Save Marks
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // On page load, populate branches and semesters
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBranches();
+            loadSemesters();
+        });
+
+        function loadBranches() {
+            fetch('/api/branches')
+                .then(r => r.json())
+                .then(branches => {
+                    const select = document.getElementById('branchSelect');
+                    branches.forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.branchId;
+                        opt.textContent = b.name;
+                        select.appendChild(opt);
+                    });
+                });
+        }
+
+        function loadSemesters() {
+            fetch('/api/semesters')
+                .then(r => r.json())
+                .then(semesters => {
+                    const select = document.getElementById('semesterSelect');
+                    semesters.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.semesterId;
+                        opt.textContent = `Semester ${s.semesterNumber}`;
+                        select.appendChild(opt);
+                    });
+                });
+        }
+
+        document.getElementById('branchSelect').addEventListener('change', loadStudents);
+        document.getElementById('semesterSelect').addEventListener('change', loadStudents);
+
+        function loadStudents() {
+            const branchId = document.getElementById('branchSelect').value;
+            const semesterId = document.getElementById('semesterSelect').value;
+
+            if (!branchId || !semesterId) {
+                document.getElementById('studentSelect').innerHTML = '<option value="">-- Select Student --</option>';
+                return;
+            }
+
+            fetch(`/api/students?branchId=${branchId}&semesterId=${semesterId}`)
+                .then(r => r.json())
+                .then(students => {
+                    const select = document.getElementById('studentSelect');
+                    select.innerHTML = '<option value="">-- Select Student --</option>';
+                    students.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.studentProfileId;
+                        opt.textContent = `${s.user.fullName} (${s.rollNumber})`;
+                        select.appendChild(opt);
+                    });
+                });
+        }
+
+        document.getElementById('filterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const branchId = document.getElementById('branchSelect').value;
+            const semesterId = document.getElementById('semesterSelect').value;
+            const studentId = document.getElementById('studentSelect').value;
+
+            if (!branchId || !semesterId || !studentId) {
+                alert('Please select all fields');
+                return;
+            }
+
+            // Store values for form submission
+            document.getElementById('hiddenSemesterId').value = semesterId;
+            document.getElementById('hiddenStudentId').value = studentId;
+
+            // Load student details and subjects
+            try {
+                const studentRes = await fetch(`/api/student/${studentId}`);
+                const student = await studentRes.json();
+
+                const subjectsRes = await fetch(`/api/subjects?semesterId=${semesterId}&branchId=${branchId}`);
+                const subjects = await subjectsRes.json();
+
+                // Display student info
+                document.getElementById('studentNameDisplay').textContent = student.user.fullName;
+                document.getElementById('rollNumberDisplay').textContent = student.rollNumber;
+
+                // Load existing marks
+                const marksRes = await fetch(`/api/marks?studentId=${studentId}&semesterId=${semesterId}`);
+                const existingMarks = await marksRes.json();
+                const marksMap = {};
+                existingMarks.forEach(m => marksMap[m.subjectId] = m.obtainedMarks);
+
+                // Build subjects form
+                const container = document.getElementById('subjectsMarksContainer');
+                container.innerHTML = '';
+
+                subjects.forEach(subj => {
+                    const existingMark = marksMap[subj.subjectId] || '';
+                    const html = `
+                        <div class="mb-3">
+                            <label class="form-label">
+                                ${subj.name} <small class="text-muted">(${subj.code})</small>
+                                <span class="badge bg-secondary">Max: ${subj.maxMarks}</span>
+                                <span class="badge bg-info">Pass: ${subj.passingMarks}</span>
+                            </label>
+                            <input type="number" 
+                                   name="marks[${subj.subjectId}]" 
+                                   class="form-control" 
+                                   min="0" max="100" 
+                                   value="${existingMark}"
+                                   placeholder="0-100"
+                                   required />
+                            <small class="text-muted">Enter marks (0-100)</small>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+
+                document.getElementById('subjectsContainer').style.display = 'block';
+            } catch (error) {
+                alert('Error loading data: ' + error.message);
+            }
+        });
+    </script>
+}

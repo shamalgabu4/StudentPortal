@@ -1,0 +1,59 @@
+@model StudentPortal.Models.Feedback
+@{
+    ViewData["Title"] = "Send Feedback";
+}
+
+<div class="mb-4">
+    <h3 class="mb-0">Send Feedback</h3>
+    <small class="text-muted">Share your thoughts and suggestions with us</small>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form id="feedbackForm" asp-action="Create" method="post">
+            <div class="card">
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @Html.ValidationSummary(false)
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="mb-3 form-floating">
+                        <input asp-for="Name" class="form-control" placeholder="Name" required minlength="2" />
+                        <label asp-for="Name">Name</label>
+                        <span asp-validation-for="Name" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    <div class="mb-3 form-floating">
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Email" required />
+                        <label asp-for="Email">Email Address</label>
+                        <span asp-validation-for="Email" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Message" class="form-label">Message</label>
+                        <textarea asp-for="Message" class="form-control" rows="6" placeholder="Share your feedback..." required minlength="10" maxlength="1000"></textarea>
+                        <small class="text-muted">Min 10 characters, Max 1000</small>
+                        <span asp-validation-for="Message" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send Feedback</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="successAlert" class="alert alert-success alert-dismissible fade show d-none mt-3" role="alert">
+    <strong>Success!</strong> Your feedback has been submitted.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

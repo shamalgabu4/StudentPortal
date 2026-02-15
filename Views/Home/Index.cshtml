@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0">Dashboard</h3>
+        <small class="text-muted">Welcome back, @ViewBag.UserName</small>
+    </div>
+    <div>
+        <button class="btn btn-sm btn-outline-secondary">Settings</button>
+    </div>
+ </div>
+
+<div class="kpi mb-4">
+    <div class="item card">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h6 class="text-muted">Total Students</h6>
+                <h3>@ViewBag.TotalStudents</h3>
+            </div>
+            <div class="text-end">
+                <i class="bi bi-people" style="font-size:28px;color:var(--primary)"></i>
+            </div>
+        </div>
+    </div>
+    <div class="item card">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h6 class="text-muted">Enrollments</h6>
+                <h3>@ViewBag.TotalEnrollments</h3>
+            </div>
+            <div class="text-end">
+                <i class="bi bi-journal-check" style="font-size:28px;color:#06b6d4"></i>
+            </div>
+        </div>
+    </div>
+    <div class="item card">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h6 class="text-muted">Feedback</h6>
+                <h3>@ViewBag.TotalFeedback</h3>
+            </div>
+            <div class="text-end">
+                <i class="bi bi-chat-dots" style="font-size:28px;color:#f59e0b"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <h5>Overview</h5>
+            <div style="height:240px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Charts placeholder</div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <h6>Recent Activity</h6>
+            <p class="text-muted">No recent activity</p>
+        </div>
+    </div>
+</div>

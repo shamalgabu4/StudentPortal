@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+:root{
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --primary: #4f46e5; /* indigo-600 */
+  --primary-600: #4338ca;
+  --accent: #06b6d4; /* cyan */
+}
+
+html,body{
+  height:100%;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background:var(--bg);
+  color:#111827;
+}
+
+.wrapper{display:flex;min-height:100vh}
+.sidebar{width:260px;background:linear-gradient(180deg,#0f172a,#0b1220);color:#c7d2fe;padding:1rem;position:fixed;top:0;bottom:0;left:0;overflow:auto}
+.sidebar .brand{font-weight:800;color:white;font-size:1.1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
+.sidebar .nav{margin-top:1rem}
+.sidebar .nav a{display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;border-radius:.5rem;color:rgba(255,255,255,.9);text-decoration:none}
+.sidebar .nav a:hover{background:rgba(255,255,255,0.04)}
+.sidebar .nav a.active{background:linear-gradient(90deg, rgba(79,70,229,0.14), rgba(6,182,212,0.06));box-shadow:0 6px 18px rgba(79,70,229,0.06)}
+.sidebar .nav svg{width:18px;height:18px}
+
+.main{margin-left:260px;flex:1;padding:1.25rem}
+.topbar{height:64px;display:flex;align-items:center;justify-content:space-between;background:transparent;padding:0 0 1rem}
+.searchbar{max-width:520px;flex:1;margin:0 1rem}
+.card{background:var(--card);border-radius:12px;padding:1rem;box-shadow:0 6px 20px rgba(15,23,42,0.06)}
+.kpi{display:flex;gap:1rem}
+.kpi .item{flex:1;padding:1rem;border-radius:10px;background:linear-gradient(180deg, rgba(79,70,229,0.05), rgba(6,182,212,0.02))}
+.table-modern{background:var(--card);border-radius:12px;padding:1rem;box-shadow:0 6px 18px rgba(15,23,42,0.04)}
+
+.btn-primary{background:var(--primary);border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-600);border-color:var(--primary-600)}
+
+.form-floating .form-control{border-radius:8px}
+
+.profile{display:flex;align-items:center;gap:.75rem}
+.avatar{width:40px;height:40px;border-radius:9999px;background:linear-gradient(90deg,var(--primary),var(--accent));display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700}
+
+/* responsive */
+@media (max-width: 768px){
+  .sidebar{position:relative;width:100%;height:auto}
+  .main{margin-left:0}
+}
+
+/* marksheet */
+.marks-grid{display:flex;gap:1rem;flex-wrap:wrap}
+.marks-grid .card{flex:1;min-width:220px}
+
+/* subtle hover */
+.list-row:hover{background:rgba(15,23,42,0.02)}

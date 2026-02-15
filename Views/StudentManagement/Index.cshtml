@@ -1,0 +1,67 @@
+@model List<StudentPortal.Models.StudentProfile>
+@{
+    ViewData["Title"] = "Manage Students";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0">Student Management</h3>
+        <small class="text-muted">View and manage all students</small>
+    </div>
+    <a class="btn btn-primary btn-sm" asp-action="Create"><i class="bi bi-person-plus"></i> Add Student</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Roll Number</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Branch</th>
+                    <th>Semester</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td><strong>@student.RollNumber</strong></td>
+                        <td>@student.User?.FullName</td>
+                        <td>@student.Email</td>
+                        <td>@student.PhoneNumber</td>
+                        <td>@student.Branch?.Name</td>
+                        <td>@student.CurrentSemester?.SemesterNumber</td>
+                        <td>
+                            @if (student.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@student.StudentProfileId" title="Edit"><i class="bi bi-pencil"></i></a>
+                                @if (student.IsActive)
+                                {
+                                    <a class="btn btn-outline-danger" asp-action="Deactivate" asp-route-id="@student.StudentProfileId" onclick="return confirm('Deactivate this student?')" title="Deactivate"><i class="bi bi-x-circle"></i></a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-outline-success" asp-action="Activate" asp-route-id="@student.StudentProfileId" title="Activate"><i class="bi bi-check-circle"></i></a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

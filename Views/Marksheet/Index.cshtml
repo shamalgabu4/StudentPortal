@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "Marksheet";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0">Marksheet Calculator</h4>
+    <small class="text-muted">Enter marks out of 100</small>
+<style>
+    .marksheet-card{max-width:920px;margin:auto}
+    .subject-row{display:flex;gap:1rem;flex-wrap:wrap}
+    .subject-input{flex:1;min-width:200px}
+    .result-value{font-size:1.4rem;transition:all .4s cubic-bezier(.2,.8,.2,1)}
+    .progress {height:14px;border-radius:999px;overflow:hidden}
+    .grade-badge{padding:.5rem 0.75rem;border-radius:.5rem;font-weight:700}
+    .invalid-feedback{display:block}
+</style>
+
+<div class="card marksheet-card p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h4 class="mb-0">Marksheet Calculator</h4>
+            <small class="text-muted">Enter marks for each subject (0–100)</small>
+        </div>
+    </div>
+
+    <form id="marksheetForm" novalidate>
+        <div class="subject-row mb-3">
+            <div class="subject-input">
+                <label class="form-label"><i class="bi bi-calculator-fill text-primary me-1"></i> Mathematics</label>
+                <input id="math" class="form-control" type="number" min="0" max="100" step="1" placeholder="Enter marks (0–100)" required />
+                <div class="invalid-feedback text-danger" data-for="math"></div>
+            </div>
+
+            <div class="subject-input">
+                <label class="form-label"><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Physics</label>
+                <input id="physics" class="form-control" type="number" min="0" max="100" step="1" placeholder="Enter marks (0–100)" required />
+                <div class="invalid-feedback text-danger" data-for="physics"></div>
+            </div>
+        </div>
+
+        <div class="subject-row mb-3">
+            <div class="subject-input">
+                <label class="form-label"><i class="bi bi-flask-fill text-info me-1"></i> Chemistry</label>
+                <input id="chemistry" class="form-control" type="number" min="0" max="100" step="1" placeholder="Enter marks (0–100)" required />
+                <div class="invalid-feedback text-danger" data-for="chemistry"></div>
+            </div>
+
+            <div class="subject-input">
+                <label class="form-label"><i class="bi bi-chat-left-text-fill text-secondary me-1"></i> English</label>
+                <input id="english" class="form-control" type="number" min="0" max="100" step="1" placeholder="Enter marks (0–100)" required />
+                <div class="invalid-feedback text-danger" data-for="english"></div>
+            </div>
+        </div>
+
+        <div class="subject-row mb-3">
+            <div class="subject-input">
+                <label class="form-label"><i class="bi bi-laptop-fill text-success me-1"></i> Computer Science</label>
+                <input id="cs" class="form-control" type="number" min="0" max="100" step="1" placeholder="Enter marks (0–100)" required />
+                <div class="invalid-feedback text-danger" data-for="cs"></div>
+            </div>
+        </div>
+
+        <div class="d-grid mt-3">
+            <button id="calculateBtn" type="button" class="btn btn-primary" disabled>Calculate</button>
+        </div>
+    </form>
+
+    <hr class="my-4">
+
+    <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Total Marks</div>
+                <div id="totalMarks" class="result-value">0 / 500</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Percentage</div>
+                        <div id="percentageText" class="result-value">0.00%</div>
+                    </div>
+                    <div style="width:40%">
+                        <div class="progress">
+                            <div id="percentageBar" class="progress-bar bg-success" role="progressbar" style="width:0%" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Grade</div>
+                <div id="gradeBadge" class="grade-badge mt-2">N/A</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+<script>
+    (function(){
+        const fields = ['math','physics','chemistry','english','cs'];
+        const state = {};
+        const btn = document.getElementById('calculateBtn');
+
+        function setError(id, msg){
+            const el = document.querySelector(`.invalid-feedback[data-for="${id}"]`);
+            el.textContent = msg || '';
+        }
+
+        function validateField(id){
+            const input = document.getElementById(id);
+            const val = input.value.trim();
+            if(val === ''){ setError(id,'This field is required'); input.classList.add('is-invalid'); state[id]=false; return false; }
+            const num = Number(val);
+            if(Number.isNaN(num)){ setError(id,'Invalid number'); input.classList.add('is-invalid'); state[id]=false; return false; }
+            if(num < 0){ setError(id,'Value cannot be less than 0'); input.classList.add('is-invalid'); state[id]=false; return false; }
+            if(num > 100){ setError(id,'Value cannot be greater than 100'); input.classList.add('is-invalid'); state[id]=false; return false; }
+            setError(id,''); input.classList.remove('is-invalid'); state[id]=true; return true;
+        }
+
+        function updateButton(){
+            const allValid = fields.every(f=>state[f]===true);
+            btn.disabled = !allValid;
+        }
+
+        fields.forEach(id=>{
+            state[id]=false;
+            const el = document.getElementById(id);
+            el.addEventListener('input', function(){ validateField(id); updateButton(); });
+            el.addEventListener('blur', function(){ validateField(id); updateButton(); });
+        });
+
+        function computeGrade(p){
+            if(p>=90) return {g:'A+', cls:'text-white', bg:'bg-success'};
+            if(p>=80) return {g:'A', cls:'text-white', bg:'bg-success'};
+            if(p>=70) return {g:'B', cls:'text-dark', bg:'bg-info'};
+            if(p>=60) return {g:'C', cls:'text-dark', bg:'bg-info'};
+            if(p>=50) return {g:'D', cls:'text-dark', bg:'bg-warning'};
+            return {g:'Fail', cls:'text-white', bg:'bg-danger'};
+        }
+
+        function animateValue(el, newValue){
+            el.style.opacity = 0; el.style.transform = 'translateY(-6px)';
+            setTimeout(()=>{ el.textContent = newValue; el.style.opacity = 1; el.style.transform='translateY(0)'; }, 150);
+        }
+
+        btn.addEventListener('click', function(){
+            const values = fields.map(id=>Number(document.getElementById(id).value||0));
+            const total = values.reduce((a,b)=>a+b,0);
+            const percentage = (total / (values.length*100)) * 100;
+            const pctText = percentage.toFixed(2) + '%';
+
+            // update total
+            animateValue(document.getElementById('totalMarks'), `${total} / 500`);
+
+            // update percentage
+            animateValue(document.getElementById('percentageText'), pctText);
+            const bar = document.getElementById('percentageBar');
+            bar.style.width = percentage + '%';
+            // change bar color for fail vs pass
+            bar.classList.remove('bg-success','bg-info','bg-warning','bg-danger');
+            if(percentage<50) bar.classList.add('bg-danger');
+            else if(percentage<60) bar.classList.add('bg-warning');
+            else bar.classList.add('bg-success');
+
+            // grade
+            const grade = computeGrade(percentage);
+            const badge = document.getElementById('gradeBadge');
+            badge.textContent = grade.g;
+            badge.className = 'grade-badge mt-2 ' + grade.bg + ' ' + grade.cls;
+        });
+
+    })();
+</script>
+}

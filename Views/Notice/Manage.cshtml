@@ -1,0 +1,60 @@
+@model List<StudentPortal.Models.Notice>
+@{
+    ViewData["Title"] = "Manage Notices";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0">Notices & Announcements</h3>
+        <small class="text-muted">Manage all system notices</small>
+    </div>
+    <a class="btn btn-primary btn-sm" asp-action="Create"><i class="bi bi-megaphone"></i> Create Notice</a>
+</div>
+
+<div class="card">
+    @if (Model.Any())
+    {
+        <div class="list-group list-group-flush">
+            @foreach (var notice in Model)
+            {
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h6 class="mb-0">@notice.Title</h6>
+                                @if (notice.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </div>
+                            <p class="mb-2 text-muted text-sm">@notice.Content.Substring(0, Math.Min(150, notice.Content.Length))...</p>
+                            <small class="text-muted">
+                                <span class="badge bg-light text-dark">@notice.Category</span>
+                                <span class="ms-2">@notice.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</span>
+                                <span class="ms-2">by @notice.CreatedByUser?.UserName</span>
+                            </small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@notice.NoticeId" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <form asp-action="Delete" method="post" style="display:inline" onsubmit="return confirm('Delete this notice?')">
+                                <input type="hidden" name="id" value="@notice.NoticeId" />
+                                <button type="submit" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card-body text-center py-5 text-muted">
+            <i class="bi bi-megaphone" style="font-size:32px;display:block;margin-bottom:1rem;opacity:0.5"></i>
+            <p>No notices yet. Create one to get started.</p>
+        </div>
+    }
+</div>

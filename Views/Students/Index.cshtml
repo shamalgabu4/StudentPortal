@@ -1,0 +1,57 @@
+@model IEnumerable<StudentPortal.Models.Student>
+@{
+    ViewData["Title"] = "Students";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Students</h4>
+    <div class="d-flex gap-2">
+        <input id="studentSearch" class="form-control form-control-sm" placeholder="Search students..." style="min-width:220px" />
+        <a class="btn btn-primary btn-sm" asp-action="Create"><i class="bi bi-plus-lg"></i> Add</a>
+    </div>
+ </div>
+
+<div class="table-modern">
+    <table class="table align-middle mb-0">
+        <thead class="text-muted small">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="studentsTable">
+        @foreach(var s in Model){
+            <tr class="list-row">
+                <td>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar" style="width:36px;height:36px">@(string.IsNullOrEmpty(s.Name) ? "?" : s.Name[0])</div>
+                        <div>
+                            <div class="fw-semibold">@s.Name</div>
+                            <div class="text-muted small">@s.DateOfBirth?.ToString("yyyy-MM-dd")</div>
+                        </div>
+                    </div>
+                </td>
+                <td>@s.Email</td>
+                <td>@s.Phone</td>
+                <td>@s.Course</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary me-1" asp-action="Edit" asp-route-id="@s.StudentId"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@s.StudentId"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById('studentSearch')?.addEventListener('input', function(e){
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('#studentsTable tr').forEach(tr=>{
+        tr.style.display = tr.innerText.toLowerCase().includes(q)?'':'none';
+    });
+});
+</script>

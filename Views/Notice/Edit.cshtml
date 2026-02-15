@@ -1,0 +1,57 @@
+@model StudentPortal.Models.Notice
+@{
+    ViewData["Title"] = "Edit Notice";
+}
+
+<div class="mb-4">
+    <h3 class="mb-0">Edit Notice</h3>
+    <small class="text-muted">Update notice details</small>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="NoticeId" />
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-3 form-floating">
+                        <input type="text" asp-for="Title" class="form-control" placeholder="Title" required />
+                        <label asp-for="Title">Title</label>
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3 form-floating">
+                        <select asp-for="Category" class="form-select" required>
+                            <option value="General">General</option>
+                            <option value="Exam">Exam</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Events">Events</option>
+                        </select>
+                        <label asp-for="Category">Category</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Content" class="form-label">Content</label>
+                        <textarea asp-for="Content" class="form-control" rows="6" placeholder="Enter notice content" required></textarea>
+                        <span asp-validation-for="Content" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch">
+                        <input type="checkbox" asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label">Active (visible to students)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check"></i> Update Notice</button>
+                <a class="btn btn-secondary" asp-action="Manage">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
