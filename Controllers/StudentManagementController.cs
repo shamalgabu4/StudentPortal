@@ -101,7 +101,19 @@ namespace StudentPortal.Controllers
 
             try
             {
-                _context.Update(profile);
+                var student = await _context.StudentProfiles.FindAsync(id);
+                if (student == null) return NotFound();
+
+                // Update only allowed fields to avoid accidentally changing the UserId (FK)
+                student.RollNumber = profile.RollNumber;
+                student.Email = profile.Email;
+                student.PhoneNumber = profile.PhoneNumber;
+                student.DateOfBirth = profile.DateOfBirth;
+                student.IsActive = profile.IsActive;
+                student.BranchId = profile.BranchId;
+                student.CurrentSemesterId = profile.CurrentSemesterId;
+
+                _context.Update(student);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
