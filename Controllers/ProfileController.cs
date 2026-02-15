@@ -89,7 +89,7 @@ namespace StudentPortal.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
 
-            var changeResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            var changeResult = await _userManager.ChangePasswordAsync(user, model.OldPassword!, model.NewPassword!);
             if (!changeResult.Succeeded)
             {
                 foreach (var error in changeResult.Errors)

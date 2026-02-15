@@ -3,7 +3,8 @@
     ViewData["Title"] = "Semester Results";
     var semester = ViewBag.Semester as StudentPortal.Models.Semester;
     var totalMarks = ViewBag.TotalMarks;
-    var avgMarks = decimal.TryParse(ViewBag.AverageMarks?.ToString(), out var avg) ? avg : 0m;
+    decimal avg;
+    var avgMarks = decimal.TryParse(ViewBag.AverageMarks?.ToString(), out avg) ? avg : 0m;
 }
 
 <div class="mb-4">

@@ -25,12 +25,14 @@ namespace StudentPortal.Controllers
             if (!semesterId.HasValue)
                 return View(new List<Marks>());
 
+            var sid = semesterId.Value;
+
             var marks = await _context.Marks
-                .Where(m => m.SemesterId == semesterId)
+                .Where(m => m.SemesterId == sid)
                 .Include(m => m.StudentProfile)
                     .ThenInclude(s => s.User)
                 .Include(m => m.Subject)
-                .OrderBy(m => m.StudentProfile.RollNumber)
+                .OrderBy(m => m.StudentProfile!.RollNumber)
                 .ToListAsync();
 
             return View(marks);

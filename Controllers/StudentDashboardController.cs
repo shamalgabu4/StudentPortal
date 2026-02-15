@@ -22,11 +22,13 @@ namespace StudentPortal.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
             var studentProfile = await _context.StudentProfiles
                 .Include(s => s.User)
                 .Include(s => s.Branch)
                 .Include(s => s.CurrentSemester)
-                .FirstOrDefaultAsync(s => s.UserId == user!.Id);
+                .FirstOrDefaultAsync(s => s.UserId == user.Id);
 
             if (studentProfile == null)
                 return RedirectToAction("Login", "Account");
@@ -46,9 +48,11 @@ namespace StudentPortal.Controllers
         public async Task<IActionResult> Results()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
             var studentProfile = await _context.StudentProfiles
                 .Include(s => s.Branch)
-                .FirstOrDefaultAsync(s => s.UserId == user!.Id);
+                .FirstOrDefaultAsync(s => s.UserId == user.Id);
 
             if (studentProfile == null)
                 return RedirectToAction("Login", "Account");
@@ -72,11 +76,16 @@ namespace StudentPortal.Controllers
         public async Task<IActionResult> ViewMarks(int semesterId)
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
             var studentProfile = await _context.StudentProfiles
-                .FirstOrDefaultAsync(s => s.UserId == user!.Id);
+                .FirstOrDefaultAsync(s => s.UserId == user.Id);
+
+            if (studentProfile == null)
+                return RedirectToAction("Login", "Account");
 
             var marks = await _context.Marks
-                .Where(m => m.StudentProfileId == studentProfile!.StudentProfileId && m.SemesterId == semesterId)
+                .Where(m => m.StudentProfileId == studentProfile.StudentProfileId && m.SemesterId == semesterId)
                 .Include(m => m.Subject)
                 .Include(m => m.Semester)
                 .ToListAsync();

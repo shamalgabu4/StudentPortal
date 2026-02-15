@@ -42,7 +42,7 @@ namespace StudentPortal.Controllers
             var students = await _context.StudentProfiles
                 .Where(s => s.BranchId == branchId && s.IsActive)
                 .Include(s => s.User)
-                .Select(s => new { s.StudentProfileId, s.RollNumber, s.User.FullName, User = s.User })
+                .Select(s => new { s.StudentProfileId, s.RollNumber, FullName = s.User!.FullName, User = s.User! })
                 .ToListAsync();
             return Ok(students);
         }
@@ -53,7 +53,7 @@ namespace StudentPortal.Controllers
             var student = await _context.StudentProfiles
                 .Where(s => s.StudentProfileId == studentId)
                 .Include(s => s.User)
-                .Select(s => new { s.StudentProfileId, s.RollNumber, s.User.FullName, User = s.User })
+                .Select(s => new { s.StudentProfileId, s.RollNumber, FullName = s.User!.FullName, User = s.User! })
                 .FirstOrDefaultAsync();
 
             if (student == null) return NotFound();
