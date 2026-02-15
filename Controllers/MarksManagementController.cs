@@ -32,7 +32,7 @@ namespace StudentPortal.Controllers
                 .Include(m => m.StudentProfile)
                     .ThenInclude(s => s.User)
                 .Include(m => m.Subject)
-                .OrderBy(m => m.StudentProfile!.RollNumber)
+                .OrderBy(m => m.StudentProfile != null ? m.StudentProfile.RollNumber : string.Empty)
                 .ToListAsync();
 
             return View(marks);
